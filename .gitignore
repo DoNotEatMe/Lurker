@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 #Credentials refuse
 Credentials/credentials.cpp
+/Credentials/cpedentials.cpp
