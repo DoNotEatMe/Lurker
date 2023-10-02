@@ -13,7 +13,7 @@ public:
 
 	// return cURL result
 	std::string GetBuffer();
-
+	void clearBuffer();
 
 	~cURLing() {};
 

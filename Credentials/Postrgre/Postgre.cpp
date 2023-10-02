@@ -58,7 +58,6 @@ void Postgre::TablesCheck()
                 game_platform_mac boolean,
                 game_platform_linux boolean,
                 game_metacritic_score integer,
-                game_genre text,
                 game_total_recommendations integer,
                 game_coming_soon boolean,
                 game_release_date date,
@@ -80,7 +79,7 @@ void Postgre::TablesCheck()
             CREATE TABLE IF NOT EXISTS public.developers
             (
                 pk_developer_id serial NOT NULL,
-                developer text NOT NULL,
+                developer_name text UNIQUE NOT NULL,
                 PRIMARY KEY (pk_developer_id)
             )
             WITH (
@@ -95,7 +94,7 @@ void Postgre::TablesCheck()
             CREATE TABLE IF NOT EXISTS public.publishers
             (
                 pk_publisher_id serial NOT NULL,
-                publisher text NOT NULL,
+                publisher_name text UNIQUE NOT NULL,
                 PRIMARY KEY (pk_publisher_id)
             )
             WITH (
@@ -110,17 +109,18 @@ void Postgre::TablesCheck()
             CREATE TABLE IF NOT EXISTS public.game_publisher
             (
                 fk_game_appid integer NOT NULL,
-                fk_publisher integer NOT NULL,
+                fk_publisher_id integer NOT NULL,
                 CONSTRAINT fk_game_appid FOREIGN KEY (fk_game_appid)
                     REFERENCES public.games (pk_game_appid) MATCH SIMPLE
                     ON UPDATE NO ACTION
                     ON DELETE NO ACTION
                     NOT VALID,
-                CONSTRAINT fk_publisher FOREIGN KEY (fk_publisher)
+                CONSTRAINT fk_publisher FOREIGN KEY (fk_publisher_id)
                     REFERENCES public.publishers (pk_publisher_id) MATCH SIMPLE
                     ON UPDATE NO ACTION
                     ON DELETE NO ACTION
-                    NOT VALID
+                    NOT VALID,
+                CONSTRAINT unique_game_publisher UNIQUE (fk_game_appid, fk_publisher_id)
             )
             WITH (
                 OIDS = FALSE
@@ -134,17 +134,18 @@ void Postgre::TablesCheck()
             CREATE TABLE IF NOT EXISTS public.game_developer
             (
                 fk_game_appid integer NOT NULL,
-                fk_developer integer NOT NULL,
+                fk_developer_id integer NOT NULL,
                 CONSTRAINT fk_game_appid FOREIGN KEY (fk_game_appid)
                     REFERENCES public.games (pk_game_appid) MATCH SIMPLE
                     ON UPDATE NO ACTION
                     ON DELETE NO ACTION
                     NOT VALID,
-                CONSTRAINT fk_developer FOREIGN KEY (fk_developer)
+                CONSTRAINT fk_developer FOREIGN KEY (fk_developer_id)
                     REFERENCES public.developers (pk_developer_id) MATCH SIMPLE
                     ON UPDATE NO ACTION
                     ON DELETE NO ACTION
-                    NOT VALID
+                    NOT VALID,
+                CONSTRAINT unique_game_developer UNIQUE (fk_game_appid, fk_developer_id)
             )
             WITH (
                 OIDS = FALSE
@@ -158,7 +159,7 @@ void Postgre::TablesCheck()
             CREATE TABLE IF NOT EXISTS public.game_dlc
             (
                 fk_game_appid integer NOT NULL,
-                dlc integer NOT NULL,
+                dlc_id integer NOT NULL,
                 CONSTRAINT fk_game_appid FOREIGN KEY (fk_game_appid)
                     REFERENCES public.games (pk_game_appid) MATCH SIMPLE
                     ON UPDATE NO ACTION
@@ -178,7 +179,8 @@ void Postgre::TablesCheck()
             (
                 pk_genre_id integer NOT NULL,
                 genre_name text NOT NULL,
-                PRIMARY KEY (pk_genre_id)
+                PRIMARY KEY (pk_genre_id),
+                CONSTRAINT unique_genre_id_name UNIQUE (pk_genre_id, genre_name)
             )
             WITH (
                 OIDS = FALSE
@@ -216,7 +218,8 @@ void Postgre::TablesCheck()
                     REFERENCES public.genres (pk_genre_id) MATCH SIMPLE
                     ON UPDATE NO ACTION
                     ON DELETE NO ACTION
-                    NOT VALID
+                    NOT VALID,
+                CONSTRAINT unique_game_genres UNIQUE (fk_game_appid, fk_genre_id)
             )
             WITH (
                 OIDS = FALSE
@@ -239,7 +242,8 @@ void Postgre::TablesCheck()
                     REFERENCES public.categories (pk_category_id) MATCH SIMPLE
                     ON UPDATE NO ACTION
                     ON DELETE NO ACTION
-                    NOT VALID
+                    NOT VALID,
+                CONSTRAINT unique_game_category UNIQUE (fk_game_appid, fk_category_id)
             )
             WITH (
                 OIDS = FALSE

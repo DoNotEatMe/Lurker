@@ -30,49 +30,51 @@ int main() {
 	rapidjson::Document document;
 	document.Parse(curl.GetBuffer().c_str());
 
+	curl.clearBuffer();
+
 	const rapidjson::Value& apps = document["applist"]["apps"];
-	
-	if (apps.IsArray()) {
-		
-		pqxx::connection* connPtr = DB.Connect();
-		
-		try {
-			pqxx::work txn(*connPtr);
-			
-			std::string sql = "INSERT INTO games (pk_game_appid, game_name) VALUES ($1, $2) ON CONFLICT (pk_game_appid) DO NOTHING";
-						
-			auto start_time = std::chrono::high_resolution_clock::now();
-					
-			const size_t batchSize = 100;
-			
-			for (rapidjson::SizeType i = 0; i < apps.Size(); ++i) {
-				const rapidjson::Value& game = apps[i];
-				if (game.IsObject() && game.HasMember("appid") && game.HasMember("name")) {
-										
-					
-					pqxx::params params;
-					params.append(game["appid"].GetInt());
-					params.append(game["name"].GetString());
 
-					txn.exec_params(sql, game["appid"].GetInt(), game["name"].GetString());
+	pqxx::connection* connPtr = DB.Connect();
+	pqxx::work txn(*connPtr);
+	std::string sql = "SELECT COUNT(*) FROM games";
+	pqxx::result res = txn.exec(sql);
+
+	if (apps.Size() != std::stoi(res[0][0].c_str())) {
+		
+		if (apps.IsArray()) {
+		
+			try {
+			
+				std::string sql = "INSERT INTO games (pk_game_appid, game_name) VALUES ($1, $2) ON CONFLICT (pk_game_appid) DO NOTHING";
+						
+				auto start_time = std::chrono::high_resolution_clock::now();
 					
-					if (i > 0 && i % batchSize == 0) {
-						txn.commit();
-						pqxx::work txn(*connPtr);
+				const size_t batchSize = 1000;
+			
+				for (rapidjson::SizeType i = 0; i < apps.Size(); ++i) {
+					const rapidjson::Value& game = apps[i];
+					if (game.IsObject() && game.HasMember("appid") && game.HasMember("name")) {
+					
+						txn.exec_params(sql, game["appid"].GetInt(), game["name"].GetString());
+					
+						if (i > 0 && i % batchSize == 0) {
+							txn.commit();
+							pqxx::work txn(*connPtr);
+						}
+					
 					}
-					
 				}
+
+				txn.commit();
+						
+				auto end_time = std::chrono::high_resolution_clock::now();
+				auto duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time);
+						
+				std::cout << "Query execution time: " << duration.count() << " seconds" << std::endl;
+
+			} catch (const std::exception& e) {
+				std::cerr << "Error: " << e.what() << std::endl;
 			}
-
-			txn.commit();
-						
-			auto end_time = std::chrono::high_resolution_clock::now();
-			auto duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time);
-						
-			std::cout << "Query execution time: " << duration.count() << " seconds" << std::endl;
-
-		} catch (const std::exception& e) {
-			std::cerr << "Error: " << e.what() << std::endl;
 		}
 	}
 }
