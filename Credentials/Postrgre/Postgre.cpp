@@ -51,9 +51,7 @@ void Postgre::TablesCheck()
                 game_type text,
                 game_is_free boolean,
                 game_short_description text,
-                game_header_image text,
-                game_capsule_image text,
-                game_capsule_imagev5 text,
+                game_long_description text,
                 game_website text,
                 game_initial_price numeric,
                 game_platform_windows boolean,
@@ -66,6 +64,7 @@ void Postgre::TablesCheck()
                 game_release_date date,
                 game_support_url text,
                 game_support_mail text,
+                game_last_db_update timestamp without time zone,
                 PRIMARY KEY (pk_game_appid)
             )
             WITH (
@@ -155,11 +154,133 @@ void Postgre::TablesCheck()
                 OWNER to postgres;
         )";
 
+    const std::string createDLC = R"(
+            CREATE TABLE IF NOT EXISTS public.game_dlc
+            (
+                fk_game_appid integer NOT NULL,
+                dlc integer NOT NULL,
+                CONSTRAINT fk_game_appid FOREIGN KEY (fk_game_appid)
+                    REFERENCES public.games (pk_game_appid) MATCH SIMPLE
+                    ON UPDATE NO ACTION
+                    ON DELETE NO ACTION
+                    NOT VALID   
+            )
+            WITH (
+                OIDS = FALSE
+            );
+
+            ALTER TABLE IF EXISTS public.game_dlc
+                OWNER to postgres;
+        )";
+
+    const std::string createGenres = R"(
+            CREATE TABLE IF NOT EXISTS public.genres
+            (
+                pk_genre_id integer NOT NULL,
+                genre_name text NOT NULL,
+                PRIMARY KEY (pk_genre_id)
+            )
+            WITH (
+                OIDS = FALSE
+            );
+
+            ALTER TABLE IF EXISTS public.genres
+                OWNER to postgres;
+        )";
+
+    const std::string createCategories = R"(
+            CREATE TABLE IF NOT EXISTS public.categories
+            (
+                pk_category_id integer NOT NULL,
+                category_name text NOT NULL,
+                PRIMARY KEY (pk_category_id)
+            )
+            WITH (
+                OIDS = FALSE
+            );
+
+            ALTER TABLE IF EXISTS public.categories
+                OWNER to postgres;
+        )";
+    const std::string createGameGenres = R"(
+            CREATE TABLE IF NOT EXISTS public.game_genres
+            (
+                fk_game_appid integer NOT NULL,
+                fk_genre_id integer NOT NULL,
+                CONSTRAINT fk_game_appid FOREIGN KEY (fk_game_appid)
+                    REFERENCES public.games (pk_game_appid) MATCH SIMPLE
+                    ON UPDATE NO ACTION
+                    ON DELETE NO ACTION
+                    NOT VALID,
+                CONSTRAINT fk_genre_id FOREIGN KEY (fk_genre_id)
+                    REFERENCES public.genres (pk_genre_id) MATCH SIMPLE
+                    ON UPDATE NO ACTION
+                    ON DELETE NO ACTION
+                    NOT VALID
+            )
+            WITH (
+                OIDS = FALSE
+            );
+
+            ALTER TABLE IF EXISTS public.game_genres
+                OWNER to postgres;
+        )";
+    const std::string createGameCategory = R"(
+            CREATE TABLE IF NOT EXISTS public.game_category
+            (
+                fk_game_appid integer NOT NULL,
+                fk_category_id integer NOT NULL,
+                CONSTRAINT fk_game_appid FOREIGN KEY (fk_game_appid)
+                    REFERENCES public.games (pk_game_appid) MATCH SIMPLE
+                    ON UPDATE NO ACTION
+                    ON DELETE NO ACTION
+                    NOT VALID,
+                CONSTRAINT fk_category_id FOREIGN KEY (fk_category_id)
+                    REFERENCES public.categories (pk_category_id) MATCH SIMPLE
+                    ON UPDATE NO ACTION
+                    ON DELETE NO ACTION
+                    NOT VALID
+            )
+            WITH (
+                OIDS = FALSE
+            );
+
+            ALTER TABLE IF EXISTS public.game_category
+                OWNER to postgres;
+        )";
+
+    const std::string createGameLanguage = R"(
+            CREATE TABLE IF NOT EXISTS public.game_language
+            (
+                fk_game_appid integer NOT NULL,
+                language text NOT NULL,
+                CONSTRAINT fk_game_appid FOREIGN KEY (fk_game_appid)
+                    REFERENCES public.games (pk_game_appid) MATCH SIMPLE
+                    ON UPDATE NO ACTION
+                    ON DELETE NO ACTION
+                    NOT VALID
+            )
+            WITH (
+                OIDS = FALSE
+            );
+
+            ALTER TABLE IF EXISTS public.game_language
+                OWNER to postgres;
+        )";
+
+
+
     txn.exec(createGames);    
     txn.exec(createPublishers);    
     txn.exec(createDevelopers);   
     txn.exec(createGamePublisher);   
     txn.exec(createGameDeveloper); 
+    txn.exec(createDLC);
+    txn.exec(createGenres);
+    txn.exec(createCategories);
+    txn.exec(createGameGenres);
+    txn.exec(createGameCategory);
+    txn.exec(createGameLanguage);
 
     txn.commit();
 
