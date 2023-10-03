@@ -38,9 +38,20 @@ int main() {
 	/*-------------------------------------------------------*/
 
 	for (auto& appid : UpdateAppid) {
-		pqxx::work txn(*DB.Connect());
+
+		auto currentTime = std::chrono::system_clock::now();
+		std::time_t timestamp = std::chrono::system_clock::to_time_t(currentTime);
+		
 		try {
-			//appid = 594650;
+			/*
+			appid = 999999;
+			std::string val = "Cat's";
+			std::string sql = "INSERT INTO games (pk_game_appid, game_name, game_long_description ) VALUES ($1, $2, $3)";
+			txn.exec_params(sql, appid, val, val);
+			txn.commit();
+			*/
+
+			appid = 594650;
 			std::string link = "https://store.steampowered.com/api/appdetails?appids=" + std::to_string(appid) + "&&cc=US";
 			//std::string link = "https://store.steampowered.com/api/appdetails?appids=594650&&cc=US";
 
@@ -56,141 +67,122 @@ int main() {
 
 			if (document[std::to_string(appid).c_str()].IsObject() && document[std::to_string(appid).c_str()]["success"].GetBool() == true) {
 				rapidjson::Value& app = document[std::to_string(appid).c_str()]["data"];
-
 				
 				// Games
-				std::string games = "UPDATE games SET ";
-				games += "game_type = ";
+
+				pqxx::params game_type;
+				pqxx::params game_is_free;
+				pqxx::params game_short_description;
+				pqxx::params game_long_description;
+				pqxx::params game_website;
+				pqxx::params game_initial_price;
+				pqxx::params game_platform_windows;
+				pqxx::params game_platform_mac;
+				pqxx::params game_platform_linux;
+				pqxx::params game_metacritic_score;
+				pqxx::params game_total_recommendations;
+				pqxx::params game_coming_soon;
+				pqxx::params game_release_date;
+				pqxx::params game_support_url;
+				pqxx::params game_support_mail;
+				
 				if (app.HasMember("type") && !app["type"].IsNull()) {
-					games += "'";
-					games += app["type"].GetString();
-					games += "', ";
+					game_type.append(app["type"].GetString());
 				}
-				else { games += "NULL, "; }
-
-				games += "game_is_free = ";
+				else { game_type.append(); }
+				
 				if (app.HasMember("is_free") && !app["is_free"].IsNull()) {
-					games += "'";
-					games += std::to_string(app["is_free"].GetBool());
-					games += "', ";
+					game_is_free.append(app["is_free"].GetBool());
 				}
-				else { games += "NULL, "; }
+				else { game_is_free.append(); }
 
-				games += "game_short_description = ";
 				if (app.HasMember("short_description") && !app["short_description"].IsNull()) {
-					games += "'";
-					games += app["short_description"].GetString();
-					games += "', ";
+					game_short_description.append(app["short_description"].GetString());
 				}
-				else { games += "NULL, "; }
+				else { game_short_description.append(); }
 
-				games += "game_long_description = ";
 				if (app.HasMember("detailed_description") && !app["detailed_description"].IsNull()) {
-					games += "'";
-					games += app["detailed_description"].GetString();
-					games += "', ";
+					game_long_description.append(app["detailed_description"].GetString());
 				}
-				else { games += "NULL, "; }
+				else { game_long_description.append(); }
 
-				games += "game_website = ";
 				if (app.HasMember("website") && !app["website"].IsNull()) {
-					games += "'";
-					games += app["website"].GetString();
-					games += "', ";
+					game_website.append(app["website"].GetString());
 				}
-				else { games += "NULL, "; }
+				else { game_website.append(); }
 
-				// TODO: Make correction to price (/100) && value type in DB
-				games += "game_initial_price = ";
+				// TODO: Make correction to price (/100) && field type in DB
 				if (app.HasMember("price_overview") && app["price_overview"].HasMember("initial") && !app["price_overview"]["initial"].IsNull()) {
-					games += "'";
-					games += std::to_string(app["price_overview"]["initial"].GetInt());
-					games += "', ";
+					game_initial_price.append(app["price_overview"]["initial"].GetInt());
 				}
-				else { games += "NULL, "; }
+				else { game_initial_price.append(); }
 
-				games += "game_platform_windows = ";
 				if (app.HasMember("platforms") && app["platforms"].HasMember("windows") && !app["platforms"]["windows"].IsNull()) {
-					games += "'";
-					games += std::to_string(app["platforms"]["windows"].GetBool());
-					games += "', ";
+					game_platform_windows.append(app["platforms"]["windows"].GetBool());
 				}
-				else { games += "NULL, "; }
+				else { game_platform_windows.append(); }
 
-				games += "game_platform_mac = ";
 				if (app.HasMember("platforms") && app["platforms"].HasMember("mac") && !app["platforms"]["mac"].IsNull()) {
-					games += "'";
-					games += std::to_string(app["platforms"]["mac"].GetBool());
-					games += "', ";
+					game_platform_mac.append(app["platforms"]["mac"].GetBool());
 				}
-				else { games += "NULL, "; }
+				else { game_platform_mac.append(); }
 
-				games += "game_platform_linux = ";
 				if (app.HasMember("platforms") && app["platforms"].HasMember("linux") && !app["platforms"]["linux"].IsNull()) {
-					games += "'";
-					games += std::to_string(app["platforms"]["linux"].GetBool());
-					games += "', ";
+					game_platform_linux.append(app["platforms"]["linux"].GetBool());
 				}
-				else { games += "NULL, "; }
+				else { game_platform_linux.append(); }
 
-				games += "game_metacritic_score = ";
 				if (app.HasMember("metacritic") && app["metacritic"].HasMember("score") && !app["metacritic"]["score"].IsNull()) {
-					games += "'";
-					games += std::to_string(app["metacritic"]["score"].GetInt());
-					games += "', ";
+					game_metacritic_score.append(app["metacritic"]["score"].GetInt());
 				}
-				else { games += "NULL, "; }
+				else { game_metacritic_score.append(); }
 
-				games += "game_total_recommendations = ";
 				if (app.HasMember("recommendations") && app["recommendations"].HasMember("total") && !app["recommendations"]["total"].IsNull()) {
-					games += "'";
-					games += std::to_string(app["recommendations"]["total"].GetInt());
-					games += "', ";
+					game_total_recommendations.append(app["recommendations"]["total"].GetInt());
 				}
-				else { games += "NULL, "; }
+				else { game_total_recommendations.append(); }
 
-				games += "game_coming_soon = ";
 				if (app.HasMember("release_date") && app["release_date"].HasMember("coming_soon") && !app["release_date"]["coming_soon"].IsNull()) {
-					games += "'";
-					games += std::to_string(app["release_date"]["coming_soon"].GetBool());
-					games += "', ";
+					game_coming_soon.append(app["release_date"]["coming_soon"].GetBool());
 				}
-				else { games += "NULL, "; }
+				else { game_coming_soon.append(); }
 
-				// TODO: Date format to timestamp
-				games += "game_release_date = ";
+				// TODO: Date format to timestamp && DB field to timestamp
 				if (app.HasMember("release_date") && app["release_date"].HasMember("date") && !app["release_date"]["date"].IsNull()) {
-					games += "'";
-					games += app["release_date"]["date"].GetString();
-					games += "', ";
+					game_release_date.append(app["release_date"]["date"].GetString());
 				}
-				else { games += "NULL, "; }
+				else { game_release_date.append(); }
 
-				games += "game_support_url = ";
 				if (app.HasMember("support_info") && app["support_info"].HasMember("url") && !app["support_info"]["url"].IsNull()) {
-					games += "'";
-					games += app["support_info"]["url"].GetString();
-					games += "', ";
+					game_support_url.append(app["support_info"]["url"].GetString());
 				}
-				else { games += "NULL, "; }
+				else { game_support_url.append(); }
 
-				games += "game_support_mail = ";
 				if (app.HasMember("support_info") && app["support_info"].HasMember("email") && !app["support_info"]["email"].IsNull()) {
-					games += "'";
-					games += app["support_info"]["email"].GetString();
-					games += "', ";
+					game_support_mail.append(app["support_info"]["email"].GetString());
 				}
-				else { games += "NULL, "; }
+				else { game_support_mail.append(); }
 
-				games += "game_last_db_update = NOW()";
-
-				auto currentTime = std::chrono::system_clock::now();
-				std::time_t timestamp = std::chrono::system_clock::to_time_t(currentTime);
-
-				games += " WHERE pk_game_appid = " + std::to_string(appid) + ";";
+				std::string games = "UPDATE games SET game_type = $1, game_is_free = $2, game_short_description = $3, game_long_description = $4, game_website = $5, game_initial_price = $6, game_platform_windows = $7, game_platform_mac = $8, game_platform_linux = $9, game_metacritic_score = $10, game_total_recommendations = $11, game_coming_soon = $12, game_release_date = $13, game_support_url = $14, game_support_mail = $15, game_last_db_update = NOW() WHERE pk_game_appid = $16;";
 
 				try {
-					txn.exec(games);
+					txn.exec_params(games,
+						game_type,
+						game_is_free,
+						game_short_description,
+						game_long_description,
+						game_website,
+						game_initial_price,
+						game_platform_windows,
+						game_platform_mac,
+						game_platform_linux,
+						game_metacritic_score,
+						game_total_recommendations,
+						game_coming_soon,
+						game_release_date,
+						game_support_url,
+						game_support_mail,
+						appid);
 				}
 				catch (const std::exception& e) {
 					std::cerr << "Update all games | games error: " << e.what() << std::endl;
@@ -202,17 +194,19 @@ int main() {
 				if (app.HasMember("publishers")) {
 					rapidjson::Value& pubArr = app["publishers"];
 					for (rapidjson::SizeType i = 0; i < pubArr.Size(); ++i) {
-						std::string publisher = "INSERT INTO publishers (publisher_name) VALUES ('";
-						publisher += pubArr[i].GetString();
-						publisher += "') ON CONFLICT (publisher_name) DO NOTHING;";
-						publisher += "INSERT INTO game_publisher (fk_game_appid, fk_publisher_id) SELECT '";
-						publisher += std::to_string(appid);
-						publisher += "', pk_publisher_id FROM publishers WHERE publisher_name = '";
-						publisher += pubArr[i].GetString();
-						publisher += "';";
+						pqxx::params publisher_name;
+						publisher_name.append(pubArr[i].GetString());
 
+						std::string publisherOne = "INSERT INTO publishers (publisher_name) VALUES ($1) ON CONFLICT (publisher_name) DO NOTHING;";
+						std::string publisherTwo = "INSERT INTO game_publisher (fk_game_appid, fk_publisher_id) SELECT $1, pk_publisher_id FROM publishers WHERE publisher_name = $2;";
 						try {
-							txn.exec(publisher);
+							txn.exec_params(publisherOne,
+								publisher_name
+								);
+							txn.exec_params(publisherTwo,
+								appid,
+								publisher_name
+								);
 						}
 						catch (const std::exception& e) {
 							std::cerr << "Update all games | publishers error: " << e.what() << std::endl;
@@ -224,17 +218,19 @@ int main() {
 				if (app.HasMember("developers")) {
 					rapidjson::Value& devArr = app["developers"];
 					for (rapidjson::SizeType i = 0; i < devArr.Size(); ++i) {
-						std::string developer = "INSERT INTO developers (developer_name) VALUES ('";
-						developer += devArr[i].GetString();
-						developer += "') ON CONFLICT (developer_name) DO NOTHING;";
-						developer += "INSERT INTO game_developer (fk_game_appid, fk_developer_id) SELECT '";
-						developer += std::to_string(appid);
-						developer += "', pk_developer_id FROM developers WHERE developer_name = '";
-						developer += devArr[i].GetString();
-						developer += "'ON CONFLICT (fk_game_appid, fk_developer_id) DO NOTHING;";
+						pqxx::params developer_name;
+						developer_name.append(devArr[i].GetString());
 
+						std::string developerOne = "INSERT INTO developers (developer_name) VALUES ($1) ON CONFLICT (developer_name) DO NOTHING;";
+						std::string developerTwo = "INSERT INTO game_developer (fk_game_appid, fk_developer_id) SELECT $1, pk_developer_id FROM developers WHERE developer_name = $2;";
 						try {
-							txn.exec(developer);
+							txn.exec_params(developerOne,
+								developer_name
+								);
+							txn.exec_params(developerTwo,
+								appid,
+								developer_name
+							);
 						}
 						catch (const std::exception& e) {
 							std::cerr << "Update all games | developers error: " << e.what() << std::endl;
@@ -246,19 +242,22 @@ int main() {
 				if (app.HasMember("genres")) {
 					rapidjson::Value& genArr = app["genres"];
 					for (rapidjson::SizeType i = 0; i < genArr.Size(); i++) {
-						std::string genres = "INSERT INTO genres (pk_genre_id, genre_name) VALUES ('";
-						genres += genArr[i]["id"].GetString();
-						genres += "', '";
-						genres += genArr[i]["description"].GetString();
-						genres += "') ON CONFLICT (pk_genre_id, genre_name) DO NOTHING;";
-						genres += "INSERT INTO game_genres (fk_game_appid, fk_genre_id) SELECT '";
-						genres += std::to_string(appid);
-						genres += "', pk_genre_id FROM genres WHERE genre_name = '";
-						genres += genArr[i]["description"].GetString();
-						genres += "' ON CONFLICT (fk_game_appid, fk_genre_id) DO NOTHING;";
+						pqxx::params genre_id;
+						pqxx::params genre_name;
+						genre_id.append(genArr[i]["id"].GetString());
+						genre_name.append(genArr[i]["description"].GetString());
 
+						std::string genresOne = "INSERT INTO genres (pk_genre_id, genre_name) VALUES ($1, $2) ON CONFLICT (pk_genre_id, genre_name) DO NOTHING; ";
+						std::string genresTwo = "INSERT INTO game_genres(fk_game_appid, fk_genre_id) SELECT $1, pk_genre_id FROM genres WHERE genre_name = $2 ON CONFLICT(fk_game_appid, fk_genre_id) DO NOTHING; ";
 						try {
-							txn.exec(genres);
+							txn.exec_params(genresOne,
+								genre_id,
+								genre_name
+								);
+							txn.exec_params(genresTwo,
+								appid,
+								genre_name
+							);
 						}
 						catch (const std::exception& e) {
 							std::cerr << "Update all games | genres error: " << e.what() << std::endl;
@@ -270,19 +269,22 @@ int main() {
 				if (app.HasMember("categories")) {
 					rapidjson::Value& catArr = app["categories"];
 					for (rapidjson::SizeType i = 0; i < catArr.Size(); ++i) {
-						std::string categories = "INSERT INTO categories (pk_category_id, category_name) VALUES ('";
-						categories += std::to_string(catArr[i]["id"].GetInt());
-						categories += "', '";
-						categories += catArr[i]["description"].GetString();
-						categories += "') ON CONFLICT (pk_category_id, category_name) DO NOTHING;";
-						categories += "INSERT INTO game_category (fk_game_appid, fk_category_id) SELECT '";
-						categories += std::to_string(appid);
-						categories += "', pk_category_id FROM categories WHERE category_name = '";
-						categories += catArr[i]["description"].GetString();
-						categories += "' ON CONFLICT (fk_game_appid, fk_category_id) DO NOTHING;";
+						pqxx::params category_id;
+						pqxx::params category_name;
+						category_id.append(catArr[i]["id"].GetInt());
+						category_name.append(catArr[i]["description"].GetString());
 
+						std::string categoriesOne = "INSERT INTO categories (pk_category_id, category_name) VALUES ($1, $2) ON CONFLICT (pk_category_id, category_name) DO NOTHING;";
+						std::string categoriesTwo = "INSERT INTO game_category (fk_game_appid, fk_category_id) SELECT $1, pk_category_id FROM categories WHERE category_name = $2 ON CONFLICT (fk_game_appid, fk_category_id) DO NOTHING;";
 						try {
-							txn.exec(categories);
+							txn.exec_params(categoriesOne,
+								category_id,
+								category_name
+								);
+							txn.exec_params(categoriesTwo,
+								appid,
+								category_name
+								);
 						}
 						catch (const std::exception& e) {
 							std::cerr << "Update all games | categories error: " << e.what() << std::endl;
@@ -295,14 +297,16 @@ int main() {
 				if (app.HasMember("dlc")) {
 					rapidjson::Value& dlcArr = app["dlc"];
 					for (rapidjson::SizeType i = 0; i < dlcArr.Size(); ++i) {
-						std::string dlc = "INSERT INTO game_dlc (fk_game_appid, dlc_id) VALUES ('";
-						dlc += std::to_string(appid);
-						dlc += "', '";
-						dlc += std::to_string(dlcArr[i].GetInt());
-						dlc += "');";
+						pqxx::params dlc_id;
+						dlc_id.append(dlcArr[i].GetInt());
+
+						std::string dlc = "INSERT INTO game_dlc (fk_game_appid, dlc_id) VALUES ($1,$2);";
 
 						try {
-							txn.exec(dlc);
+							txn.exec_params(dlc,
+								appid,
+								dlc_id
+								);
 						}
 						catch (const std::exception& e) {
 							std::cerr << "Update all games | dlc error: " << e.what() << std::endl;
@@ -314,16 +318,19 @@ int main() {
 				if (app.HasMember("type") && !app["type"].IsNull() && app["type"].GetString() != "game" ) {
 
 					if (app.HasMember("fullgame") && app["fullgame"].HasMember("appid") && !app["fullgame"]["appid"].IsNull()) {
-						std::string dlctype = "INSERT INTO game_dlc (fk_game_appid, dlc_id, dlc_type) VALUES ('";
-						dlctype += app["fullgame"]["appid"].GetString();
-						dlctype += "', '";
-						dlctype += std::to_string(appid);
-						dlctype += "', '";
-						dlctype += app["type"].GetString();
-						dlctype += "') ON CONFLICT (fk_game_appid, dlc_id) DO UPDATE SET fk_game_appid = EXCLUDED.fk_game_appid, dlc_id = EXCLUDED.dlc_id, dlc_type = EXCLUDED.dlc_type;";
+						pqxx::params fullgame_id;
+						fullgame_id.append(app["fullgame"]["appid"].GetString());
+						pqxx::params dlc_type;
+						dlc_type.append(app["type"].GetString());
+
+						std::string dlc_notgame = "INSERT INTO game_dlc (fk_game_appid, dlc_id, dlc_type) VALUES ($1,$2, $3) ON CONFLICT (fk_game_appid, dlc_id) DO UPDATE SET fk_game_appid = EXCLUDED.fk_game_appid, dlc_id = EXCLUDED.dlc_id, dlc_type = EXCLUDED.dlc_type;";
 
 						try{
-							txn.exec(dlctype);
+							txn.exec_params(dlc_notgame,
+								fullgame_id,
+								appid,
+								dlc_type
+							);
 						}
 						catch (const std::exception& e) {
 							std::cerr << "Update all games | dlc (dlc_type) error: " << e.what() << std::endl;
@@ -345,14 +352,17 @@ int main() {
 					
 					while (it != end) {
 						std::smatch match = *it;
-						std::string language = "INSERT INTO game_language (fk_game_appid, language) VALUES ('";
-						language += std::to_string(appid);
-						language += "', '";
-						language += match.str();
-						language += "') ON CONFLICT DO NOTHING;";
+
+						pqxx::params lang_name;
+						lang_name.append(match.str());
+
+						std::string language = "INSERT INTO game_language (fk_game_appid, language) VALUES ($1,$2) ON CONFLICT DO NOTHING;";
 
 						try{
-							txn.exec(language);
+							txn.exec_params(language,
+								appid,
+								lang_name
+							);
 						}
 						catch (const std::exception& e) {
 							std::cerr << "Update all games | language error: " << e.what() << std::endl;
@@ -363,19 +373,13 @@ int main() {
 				}
 
 				txn.commit();
-				pqxx::work txn(*DB.Connect());
-				std::cout << appid << " done" << std::endl;
 
 			}
-
-
-
-
-			
 
 			auto end_time = std::chrono::high_resolution_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
 			std::cout << std::endl;
+			std::cout << appid << " done" << std::endl;
 			std::cout << "Query execution time: " << duration.count() << " ms" << std::endl;
 
 		}
