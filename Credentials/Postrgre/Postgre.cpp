@@ -160,11 +160,13 @@ void Postgre::TablesCheck()
             (
                 fk_game_appid integer NOT NULL,
                 dlc_id integer NOT NULL,
+                dlc_type text,
                 CONSTRAINT fk_game_appid FOREIGN KEY (fk_game_appid)
                     REFERENCES public.games (pk_game_appid) MATCH SIMPLE
                     ON UPDATE NO ACTION
                     ON DELETE NO ACTION
-                    NOT VALID   
+                    NOT VALID,
+                CONSTRAINT unique_game_dlc UNIQUE (fk_game_appid, dlc_id)
             )
             WITH (
                 OIDS = FALSE
@@ -195,7 +197,8 @@ void Postgre::TablesCheck()
             (
                 pk_category_id integer NOT NULL,
                 category_name text NOT NULL,
-                PRIMARY KEY (pk_category_id)
+                PRIMARY KEY (pk_category_id),
+                CONSTRAINT unique_category_id_name UNIQUE (pk_category_id, category_name)
             )
             WITH (
                 OIDS = FALSE
