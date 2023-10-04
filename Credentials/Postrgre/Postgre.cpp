@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Postgre.h"
 #include <acess.h>
+#include <pqxx/pqxx>
 
 Postgre::Postgre()
 {
@@ -275,7 +276,39 @@ void Postgre::TablesCheck()
                 OWNER to postgres;
         )";
 
+    const std::string createLogger = R"(
+            CREATE TABLE public.logger
+            (
+                pk_log_id serial NOT NULL,
+                programm_name text NOT NULL,
+                message text NOT NULL,
+                type text NOT NULL,
+                "time" timestamp without time zone NOT NULL,
+                PRIMARY KEY(pk_log_id)
+            )
+                WITH(
+                    OIDS = FALSE
+                );
 
+            ALTER TABLE IF EXISTS public.logger
+                OWNER to postgres;
+            )";
+
+    const std::string createStatus = R"(
+            CREATE TABLE public.status
+            (
+                programm_id serial UNIQUE NOT NULL,
+                programm_name text UNIQUE NOT NULL,
+                is_work boolean NOT NULL,
+                "time" timestamp without time zone NOT NULL
+            )
+                WITH(
+                    OIDS = FALSE
+                );
+
+            ALTER TABLE IF EXISTS public.status
+                OWNER to postgres;
+            )";
 
     txn.exec(createGames);    
     txn.exec(createPublishers);    
@@ -288,6 +321,8 @@ void Postgre::TablesCheck()
     txn.exec(createGameGenres);
     txn.exec(createGameCategory);
     txn.exec(createGameLanguage);
+    txn.exec(createLogger);
+    txn.exec(createStatus);
 
     txn.commit();
 

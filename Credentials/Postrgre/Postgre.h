@@ -1,5 +1,8 @@
 #pragma once
-#include <pqxx/pqxx>
+
+namespace pqxx {
+	class connection;
+}
 
 
 class Postgre {
