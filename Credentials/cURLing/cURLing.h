@@ -1,7 +1,7 @@
 #pragma once
-#include <curl/curl.h>
 #include <string>
-
+//forward declaration needed
+#include <curl/curl.h>
 
 class cURLing {
 
