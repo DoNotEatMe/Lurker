@@ -1,11 +1,16 @@
 # LurkerNew
 WIP
+
 Server app for parsing steam data from steam api (currently only steam api) and storing in postgres
 
 Current stage:
+
 cURLing - class represents connections with http.
+
 Postgres - DB connection holder with DB struct creation if needed.
+
 Logger - simple logger stored info in DB.
+
 InitAllGames - grab banch of appid and game titles and store in db. Around 170k rows. Could be not full ion case of steam api features. Purposed to fill initial game list every N time.
 UpdateGameInfo - grab every game via steam api, struct info and place in DB tables. 
 
