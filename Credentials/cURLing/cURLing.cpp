@@ -1,5 +1,7 @@
+//internal
+#include <cURLing.h>
+//system
 #include <iostream>
-#include "cURLing.h"
 #include <string>
 
 cURLing::cURLing() {
