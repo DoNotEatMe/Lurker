@@ -1,43 +1,29 @@
-#include <func.h>
+//system
 #include <iostream>
-#include <Logger/Logger.h>
+#include <chrono>
+#include <regex>
+//internal
+#include <func.h>
+#include <Logger.h>
 #include <cURLing.h>
+#include <Postgre.h>
+//vcpkg
 #include <pqxx/pqxx>
 #include <rapidjson/document.h>
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
-#include <Postgre.h>
-#include <chrono>
-#include <regex>
 
-std::string UpdateGameInfo::reformatDate(const std::string& dateStr) {
-	// Regular expressions for matching date patterns
-	std::regex monthDayYearRegex(R"((\w{3} \d{1,2}, \d{4}))");
-	std::regex monthYearRegex(R"((\w{3} \d{4}))");
 
-	std::smatch match;
 
-	// Check if the input string matches the "Month Day, Year" pattern
-	if (std::regex_match(dateStr, match, monthDayYearRegex)) {
-		return match[0];
-	}
-
-	// Check if the input string matches the "Month Year" pattern
-	if (std::regex_match(dateStr, match, monthYearRegex)) {
-		return match[0];
-	}
-
-	// Handle non-date strings here, return an empty string
-	return "";
+UpdateGameInfo::UpdateGameInfo()
+{
+	
 }
-
 
 void UpdateGameInfo::mainFunc() {
 
 	Logger log;
-
-	bool test = 1;
-	log.status("UpdateGameInfo", test);
+	
 
 	/*---------------------------------------------------------*/
 	/*  get all appid from DB, where game_last_update is empty */
@@ -61,310 +47,15 @@ void UpdateGameInfo::mainFunc() {
 	/*-------------------------------------------------------*/
 	/* main loop forming SQL requests to properly store data */
 	/*-------------------------------------------------------*/
-
-	std::vector <std::string> dates;
-	dates.push_back("Coming soon");
-	dates.push_back("Q4 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Q4 2024");
-	dates.push_back("To be announced");
-	dates.push_back("To be announced");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Q4 2023");
-	dates.push_back("To be announced");
-	dates.push_back("2023");
-	dates.push_back("2024");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("To be announced");
-	dates.push_back("2024");
-	dates.push_back("To be announced");
-	dates.push_back("To be announced");
-	dates.push_back("Coming soon");
-	dates.push_back("To be announced");
-	dates.push_back("To be announced");
-	dates.push_back("To be announced");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("2024");
-	dates.push_back("Coming soon");
-	dates.push_back("To be announced");
-	dates.push_back("December 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Q1 2025");
-	dates.push_back("To be announced");
-	dates.push_back("To be announced");
-	dates.push_back("2023");
-	dates.push_back("Coming soon");
-	dates.push_back("To be announced");
-	dates.push_back("To be announced");
-	dates.push_back("October 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Q4 2025");
-	dates.push_back("2024");
-	dates.push_back("Coming soon");
-	dates.push_back("Q2 2024");
-	dates.push_back("Coming soon");
-	dates.push_back("October 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("2024");
-	dates.push_back("To be announced");
-	dates.push_back("Coming soon");
-	dates.push_back("Q4 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Q4 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Q4 2023");
-	dates.push_back("To be announced");
-	dates.push_back("2024");
-	dates.push_back("Coming soon");
-	dates.push_back("To be announced");
-	dates.push_back("Coming soon");
-	dates.push_back("2024");
-	dates.push_back("2023");
-	dates.push_back("Q4 2023");
-	dates.push_back("To be announced");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Q1 2024");
-	dates.push_back("2024");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Q4 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("May 18, 2023");
-	dates.push_back("Jul 31, 2023");
-	dates.push_back("Jun 17, 2023");
-	dates.push_back("May 15, 2023");
-	dates.push_back("To be announced");
-	dates.push_back("May 3, 2023");
-	dates.push_back("Apr 27, 2023");
-	dates.push_back("Apr 27, 2023");
-	dates.push_back("Apr 12, 2023");
-	dates.push_back("May 18, 2023");
-	dates.push_back("Apr 14, 2023");
-	dates.push_back("Apr 11, 2023");
-	dates.push_back("Aug 19, 2023");
-	dates.push_back("May 8, 2023");
-	dates.push_back("Jun 26, 2023");
-	dates.push_back("May 22, 2023");
-	dates.push_back("Apr 29, 2023");
-	dates.push_back("Apr 28, 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Apr 13, 2023");
-	dates.push_back("Sep 13, 2023");
-	dates.push_back("2023");
-	dates.push_back("Apr 13, 2023");
-	dates.push_back("Apr 12, 2023");
-	dates.push_back("May 11, 2023");
-	dates.push_back("Apr 12, 2023");
-	dates.push_back("Apr 12, 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("May 7, 2023");
-	dates.push_back("Apr 12, 2023");
-	dates.push_back("Apr 12, 2023");
-	dates.push_back("Q1 2024");
-	dates.push_back("To be announced");
-	dates.push_back("Apr 12, 2023");
-	dates.push_back("Q4 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Jun 21, 2023");
-	dates.push_back("May 22, 2023");
-	dates.push_back("May 5, 2023");
-	dates.push_back("May 21, 2023");
-	dates.push_back("Jul 26, 2023");
-	dates.push_back("To be announced");
-	dates.push_back("May 17, 2023");
-	dates.push_back("To be announced");
-	dates.push_back("October 2023");
-	dates.push_back("To be announced");
-	dates.push_back("May 25, 2023");
-	dates.push_back("Apr 27, 2023");
-	dates.push_back("May 2, 2023");
-	dates.push_back("Apr 24, 2023");
-	dates.push_back("To be announced");
-	dates.push_back("Apr 21, 2023");
-	dates.push_back("Apr 11, 2023");
-	dates.push_back("May 24, 2023");
-	dates.push_back("Jul 28, 2023");
-	dates.push_back("Apr 28, 2023");
-	dates.push_back("May 30, 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Aug 22, 2023");
-	dates.push_back("Jun 20, 2023");
-	dates.push_back("2024");
-	dates.push_back("Apr 27, 2023");
-	dates.push_back("Apr 27, 2023");
-	dates.push_back("May 17, 2023");
-	dates.push_back("May 17, 2023");
-	dates.push_back("May 12, 2023");
-	dates.push_back("Apr 11, 2023");
-	dates.push_back("Aug 3, 2023");
-	dates.push_back("Jun 2, 2023");
-	dates.push_back("May 5, 2023");
-	dates.push_back("Jun 22, 2023");
-	dates.push_back("Apr 19, 2023");
-	dates.push_back("May 5, 2023");
-	dates.push_back("Jun 15, 2023");
-	dates.push_back("Aug 17, 2023");
-	dates.push_back("Apr 21, 2023");
-	dates.push_back("May 2, 2023");
-	dates.push_back("To be announced");
-	dates.push_back("Coming soon");
-	dates.push_back("May 17, 2023");
-	dates.push_back("Aug 14, 2023");
-	dates.push_back("Apr 15, 2023");
-	dates.push_back("Apr 15, 2023");
-	dates.push_back("Q4 2023");
-	dates.push_back("Aug 29, 2023");
-	dates.push_back("To be announced");
-	dates.push_back("May 3, 2023");
-	dates.push_back("May 2, 2023");
-	dates.push_back("To be announced");
-	dates.push_back("Sep 6, 2023");
-	dates.push_back("Apr 28, 2023");
-	dates.push_back("Apr 18, 2023");
-	dates.push_back("Jun 1, 2023");
-	dates.push_back("2024");
-	dates.push_back("Apr 12, 2023");
-	dates.push_back("May 2, 2023");
-	dates.push_back("To be announced");
-	dates.push_back("Apr 25, 2023");
-	dates.push_back("Jun 7, 2023");
-	dates.push_back("May 9, 2023");
-	dates.push_back("Apr 10, 2023");
-	dates.push_back("Apr 25, 2023");
-	dates.push_back("Apr 25, 2023");
-	dates.push_back("Jun 1, 2023");
-	dates.push_back("May 29, 2023");
-	dates.push_back("To be announced");
-	dates.push_back("2024");
-	dates.push_back("Apr 19, 2023");
-	dates.push_back("Apr 22, 2023");
-	dates.push_back("Apr 28, 2023");
-	dates.push_back("May 7, 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Apr 27, 2023");
-	dates.push_back("Jun 28, 2023");
-	dates.push_back("May 2, 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("May 4, 2023");
-	dates.push_back("May 4, 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("To be announced");
-	dates.push_back("Apr 12, 2023");
-	dates.push_back("May 8, 2023");
-	dates.push_back("Jun 30, 2023");
-	dates.push_back("Jul 14, 2023");
-	dates.push_back("Apr 29, 2023");
-	dates.push_back("May 12, 2023");
-	dates.push_back("Jul 14, 2023");
-	dates.push_back("Apr 27, 2023");
-	dates.push_back("To be announced");
-	dates.push_back("May 27, 2023");
-	dates.push_back("2023");
-	dates.push_back("May 17, 2023");
-	dates.push_back("May 12, 2023");
-	dates.push_back("Apr 11, 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Aug 2, 2023");
-	dates.push_back("Apr 25, 2023");
-	dates.push_back("Apr 11, 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Apr 16, 2023");
-	dates.push_back("May 3, 2023");
-	dates.push_back("Apr 11, 2023");
-	dates.push_back("To be announced");
-	dates.push_back("Apr 29, 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("To be announced");
-	dates.push_back("Coming soon");
-	dates.push_back("Apr 24, 2023");
-	dates.push_back("Apr 10, 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Apr 11, 2023");
-	dates.push_back("Coming soon");
-	dates.push_back("Coming soon");
-	dates.push_back("Apr 20, 2023");
-	dates.push_back("Apr 27, 2023");
-	dates.push_back("Apr 27, 2023");
-	dates.push_back("Apr 27, 2023");
-	dates.push_back("May 21, 2023");
-	dates.push_back("May 5, 2023");
-	dates.push_back("To be announced");
-	dates.push_back("Coming soon");
-	dates.push_back("May 5, 2023");
-	dates.push_back("Q4 2023");
-	dates.push_back("May 1, 2023");
-
-	for (auto& a : dates) {
-
-		std::string res = reformatDate(a);
-
-		if (!res.empty()) {
-			std::cout << "ok: " << a << " " << res << std::endl;
-		}
-		else {
-			std::cout << "not: " << a << " " << res << std::endl;
-		}
-
-	}
-
-	/*date data set
-
-	int count = 0;
-	if (count < 100) {
-		for (auto& appid : UpdateAppid){
-
-			std::string link = "https://store.steampowered.com/api/appdetails?appids=" + std::to_string(appid) + "&&cc=US";
-			cURLing curl;
-			curl.getHTML(link.c_str());
-
-
-			rapidjson::Document document;
-			document.Parse(curl.GetBuffer().c_str());
-			curl.clearBuffer();
-
-			if (document.IsObject() && document[std::to_string(appid).c_str()]["success"].GetBool() == true && document[std::to_string(appid).c_str()].IsObject()) {
-				rapidjson::Value& app = document[std::to_string(appid).c_str()]["data"];
-				if (app.HasMember("release_date") && app["release_date"].HasMember("date") && !app["release_date"]["date"].IsNull()) {
-					std::cout << "dates.push_back('" << app["release_date"]["date"].GetString() << "');" << std::endl;
-					count++;
-				}
-			}
-		}
-	}
-	//end date data set
-	*/
-
-	/*
+	
 	for (auto& appid : UpdateAppid) {
-		std::cout << "current appid: " << appid << std::endl;
+		log.status("UpdateGameInfo", 1);
 		auto start_time = std::chrono::high_resolution_clock::now();
-
-		//???
-		auto currentTime = std::chrono::system_clock::now();
-		std::time_t timestamp = std::chrono::system_clock::to_time_t(currentTime);
 
 		try {
 
-			appid = 2397510;
+			//appid = 1625260;
 			std::string link = "https://store.steampowered.com/api/appdetails?appids=" + std::to_string(appid) + "&&cc=US";
-			//std::string link = "https://store.steampowered.com/api/appdetails?appids=594650&&cc=US";
 
 			cURLing curl;
 			curl.getHTML(link.c_str());
@@ -420,9 +111,9 @@ void UpdateGameInfo::mainFunc() {
 				}
 				else { game_website.append(); }
 
-				// TODO: Make correction to price (/100) && field type in DB
+				// TODO: check if numeric works well --need updrade cause of /100 dont bring .
 				if (app.HasMember("price_overview") && app["price_overview"].HasMember("initial") && !app["price_overview"]["initial"].IsNull()) {
-					game_initial_price.append(app["price_overview"]["initial"].GetInt());
+					game_initial_price.append(app["price_overview"]["initial"].GetInt()/100);
 				}
 				else { game_initial_price.append(); }
 
@@ -446,7 +137,7 @@ void UpdateGameInfo::mainFunc() {
 				}
 				else { game_metacritic_score.append(); }
 
-				// TODO: Check what is recommendations exactly is?
+				// TODO: Check what is recommendations exactly is? not code problem, but actual data
 				if (app.HasMember("recommendations") && app["recommendations"].HasMember("total") && !app["recommendations"]["total"].IsNull()) {
 					game_total_recommendations.append(app["recommendations"]["total"].GetInt());
 				}
@@ -457,36 +148,16 @@ void UpdateGameInfo::mainFunc() {
 				}
 				else { game_coming_soon.append(); }
 
-				// TODO: Date format to timestamp && DB field to timestamp  || Coming soon, Q4,
 				if (app.HasMember("release_date") && app["release_date"].HasMember("date") && !app["release_date"]["date"].IsNull()) {
-					game_release_date.append(app["release_date"]["date"].GetString());
 
-					pqxx::params params;
-					params.append(app["release_date"]["date"].GetString()); // Assuming you're adding a date as a string
-
-					std::vector <std::string> dates;
-					dates.push_back("Q4");
-					dates.push_back("Coming soon");
-					dates.push_back("Q4 2023");
-					dates.push_back("2023");
-					dates.push_back("To be announced");
-					dates.push_back("Mar 19 2023");
-					dates.push_back("Mar, 19, 2023");
-					dates.push_back("Mar ,19 2023");
-					dates.push_back("Mar Junasd 19 2023");
-					"Apr 21, 2023"
-						"Jul 25, 2023"
-
-
-
-
-
-
-
-
-
-
-
+					std::string res = reformatDate(app["release_date"]["date"].GetString());
+					if (!res.empty()) {
+						
+						game_release_date.append(res);
+					}
+					else {
+						game_release_date.append();
+					}
 				}
 				else { game_release_date.append(); }
 
@@ -523,7 +194,11 @@ void UpdateGameInfo::mainFunc() {
 
 				}
 				catch (const std::exception& e) {
-					std::cerr << "Update all games | games error: " << e.what() << std::endl;
+
+					error = e.what();
+					logmsg = "INSERT error: " + error;
+					log.post("UpdateGameInfo", appid, logmsg, "error");
+					log.status("UpdateGameInfo", 0);
 				}
 
 
@@ -533,22 +208,35 @@ void UpdateGameInfo::mainFunc() {
 					rapidjson::Value& pubArr = app["publishers"];
 					for (rapidjson::SizeType i = 0; i < pubArr.Size(); ++i) {
 						pqxx::params publisher_name;
-						publisher_name.append(pubArr[i].GetString());
+						std::string strsize = pubArr[i].GetString();
 
-						std::string publisherOne = "INSERT INTO publishers (publisher_name) VALUES ($1) ON CONFLICT (publisher_name) DO NOTHING;";
-						std::string publisherTwo = "INSERT INTO game_publisher (fk_game_appid, fk_publisher_id) SELECT $1, pk_publisher_id FROM publishers WHERE publisher_name = $2;";
-						try {
-							txn.exec_params(publisherOne,
-								publisher_name
+						if(strsize.size() > 0) {
+							publisher_name.append(pubArr[i].GetString());
+
+							std::string publisherOne = "INSERT INTO publishers (publisher_name) VALUES ($1) ON CONFLICT (publisher_name) DO NOTHING;";
+							std::string publisherTwo = "INSERT INTO game_publisher (fk_game_appid, fk_publisher_id) SELECT $1, pk_publisher_id FROM publishers WHERE publisher_name = $2;";
+							try {
+								txn.exec_params(publisherOne,
+									publisher_name
 								);
-							txn.exec_params(publisherTwo,
-								appid,
-								publisher_name
+								txn.exec_params(publisherTwo,
+									appid,
+									publisher_name
 								);
+							}
+							catch (const std::exception& e) {
+
+								error = e.what();
+								logmsg = "INSERT error: " + error;
+								log.post("UpdateGameInfo", appid, logmsg, "warning");
+								log.status("UpdateGameInfo", 0);
+
+							}
 						}
-						catch (const std::exception& e) {
-							std::cerr << "Update all games | publishers error: " << e.what() << std::endl;
+						else {
+							continue;
 						}
+						
 					}
 				}
 
@@ -571,7 +259,11 @@ void UpdateGameInfo::mainFunc() {
 							);
 						}
 						catch (const std::exception& e) {
-							std::cerr << "Update all games | developers error: " << e.what() << std::endl;
+
+							error = e.what();
+							logmsg = "INSERT error: " + error;
+							log.post("UpdateGameInfo", appid, logmsg, "warning");
+							log.status("UpdateGameInfo", 0);
 						}
 					}
 				}
@@ -598,7 +290,12 @@ void UpdateGameInfo::mainFunc() {
 							);
 						}
 						catch (const std::exception& e) {
-							std::cerr << "Update all games | genres error: " << e.what() << std::endl;
+
+							error = e.what();
+							logmsg = "INSERT error: " + error;
+							log.post("UpdateGameInfo", appid, logmsg, "warning");
+							log.status("UpdateGameInfo", 0);
+
 						}
 					}
 				}
@@ -625,7 +322,11 @@ void UpdateGameInfo::mainFunc() {
 								);
 						}
 						catch (const std::exception& e) {
-							std::cerr << "Update all games | categories error: " << e.what() << std::endl;
+
+							error = e.what();
+							logmsg = "INSERT error: " + error;
+							log.post("UpdateGameInfo", appid, logmsg, "warning");
+							log.status("UpdateGameInfo", 0);
 						}
 
 					}
@@ -647,7 +348,11 @@ void UpdateGameInfo::mainFunc() {
 								);
 						}
 						catch (const std::exception& e) {
-							std::cerr << "Update all games | dlc error: " << e.what() << std::endl;
+
+							error = e.what();
+							logmsg = "INSERT error: " + error;
+							log.post("UpdateGameInfo", appid, logmsg, "warning");
+							log.status("UpdateGameInfo", 0);
 						}
 					}
 				}
@@ -671,7 +376,11 @@ void UpdateGameInfo::mainFunc() {
 							);
 						}
 						catch (const std::exception& e) {
-							std::cerr << "Update all games | dlc (dlc_type) error: " << e.what() << std::endl;
+
+							error = e.what();
+							logmsg = "INSERT error: " + error;
+							log.post("UpdateGameInfo", appid, logmsg, "warning");
+							log.status("UpdateGameInfo", 0);
 						}
 					}
 				}
@@ -703,7 +412,11 @@ void UpdateGameInfo::mainFunc() {
 							);
 						}
 						catch (const std::exception& e) {
-							std::cerr << "Update all games | language error: " << e.what() << std::endl;
+
+							error = e.what();
+							logmsg = "INSERT error: " + error;
+							log.post("UpdateGameInfo", appid, logmsg, "warning");
+							log.status("UpdateGameInfo", 0);
 						}
 
 						++it;
@@ -715,19 +428,44 @@ void UpdateGameInfo::mainFunc() {
 			}
 
 			auto end_time = std::chrono::high_resolution_clock::now();
-			auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+			auto duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time);
 
-			std::cout << appid << " done" << std::endl;
-			std::cout << "Query execution time: " << duration.count() << " ms" << std::endl;
-			std::cout << std::endl;
+
 		}
 		catch (const std::exception& e) {
-			std::cerr << "Update all games | Main loop error: " << e.what() << std::endl;
+
+			error = e.what();
+			logmsg = "INSERT error: " + error;
+			log.post("UpdateGameInfo", appid, logmsg, "error");
+			log.status("UpdateGameInfo", 0);
 		}
 
 
 	}
-	*/
+	
+}
+
+UpdateGameInfo::~UpdateGameInfo()
+{
 }
 
 
+std::string UpdateGameInfo::reformatDate(const std::string& dateStr) {
+	std::regex monthDayYearRegex(R"((\w{3} \d{1,2}, \d{4}))");
+	std::regex monthYearRegex(R"((\w{3} \d{4}))");
+
+	std::smatch match;
+
+	if (std::regex_match(dateStr, match, monthDayYearRegex)) {
+		return match[0];
+	}
+
+	if (std::regex_match(dateStr, match, monthYearRegex)) {
+		std::string matchedMonth = match[1];
+		std::string matchedYear = match[2];
+
+		return "01 " + matchedMonth + matchedYear;
+	}
+
+	return "";
+}
