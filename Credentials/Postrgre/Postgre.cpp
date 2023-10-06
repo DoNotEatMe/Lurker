@@ -1,6 +1,9 @@
-#include <iostream>
-#include "Postgre.h"
+//internal
+#include <Postgre.h>
 #include <acess.h>
+//system
+#include <iostream>
+//vcpkg
 #include <pqxx/pqxx>
 
 Postgre::Postgre()
@@ -10,7 +13,10 @@ Postgre::Postgre()
 
 pqxx::connection* Postgre::Connect()
 {
-    
+    /*
+    D:\dev\LurkerNew\Credentials\Postrgre\Postgre.cpp(31): warning C4551: function call missing argument list
+    D:\dev\LurkerNew\Credentials\Postrgre\Postgre.cpp(41): warning C4715: 'Postgre::Connect': not all control paths return a value
+    */
     
     try {
         Acess cred;
@@ -281,6 +287,7 @@ void Postgre::TablesCheck()
             (
                 pk_log_id serial NOT NULL,
                 programm_name text NOT NULL,
+                game_appid int,
                 message text NOT NULL,
                 type text NOT NULL,
                 "time" timestamp without time zone NOT NULL,
