@@ -1,21 +1,20 @@
-#include <iostream>
-#include "InitAllGames.h"
+//internal 
 #include <cURLing.h>
+#include <Postgre.h>
+//system
+#include <iostream>
+#include <chrono>
+//vcpkg
 #include <pqxx/pqxx>
 #include <rapidjson/document.h>
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
-
-#include <Postgre.h>
-
-#include <chrono>
 
 
 /*
 *	Execution time ~50s
 *	176220 rows of appid and game titles
 */
-
 
 
 int main() {
