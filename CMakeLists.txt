@@ -3,14 +3,23 @@
 project (Lurker)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_TOOLCHAIN_FILE "D:/vcpkg/scripts/buildsystems/vcpkg.cmake")
+
+if(WIN32)
+    set(VCPKG_ROOT "D:/vcpkg/")
+    #set(CMAKE_TOOLCHAIN_FILE "D:/vcpkg/scripts/buildsystems/vcpkg.cmake")
+else()
+
+    set(VCPKG_ROOT "/root/vcpkg")
+    set(VCPKG_TARGET_TRIPLET "x64-linux")
+    #set(CMAKE_TOOLCHAIN_FILE "/root/vcpkg/scripts/buildsystems/vcpkg.cmake")
+endif()
+
+set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/out/install")
+
+find_package(CURL CONFIG REQUIRED)
+find_package(RapidJSON CONFIG REQUIRED)
+find_package(libpqxx CONFIG REQUIRED)
 
 add_subdirectory(Games)
 add_subdirectory(Credentials)
 add_subdirectory(Reccomendations)
-
-message("Found PostgreSQL: ${libpqxx_VERSION}")
-message("Current libpqxx_INCLUDE_DIRS File: ${libpqxx_INCLUDE_DIRS}")
-message("Current CMAKE_SOURCE_DIR File:${CMAKE_SOURCE_DIR}")
-
-
