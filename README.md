@@ -1,45 +1,38 @@
-# LurkerNew
+# About
 
-WIP
+**Lurker** planned as complex server app to parse steam data and store into DB inspired by SteamDB and SteamSpy.
+Project was created in educational purposes. 
+Lurker is pretty shallow now, but I have vision to work on.
 
-Server app for parsing steam data from steam api (currently only steam api) and storing in postgres
 
-Current stage:
-
-cURLing - class represents connections with http.
-
-Postgres - DB connection holder with DB struct creation if needed.
-
-Logger - simple logger stored info in DB.
-
-InitAllGames - grab banch of appid and game titles and store in db. Around 170k rows. Could be not full ion case of steam api features. Purposed to fill initial game list every N time.
-
-UpdateGameInfo - grab every game via steam api, struct info and place in DB tables. 
+## Current stage
+* Common libs
+	* [cURLing](/Credentials/cURLing/cURLing.cpp) - cURL returning buffer with page data
+	* [Logger](/Credentials/Logger/Logger.cpp) - simple class to store logs to DB
+	* [Postgre](/Credentials/Postgre/Postgre.cpp) - DB connection holder (/Credentials/credentials.cpp reqiured)
+* Common apps
+	* [InitAllGames](/Games/InitAllGames/InitAllGames.cpp) - Get gamelist feom steam web api and insert appid and game title to DB
+	* [UpdateGameInfo](/Games/UpdateGameInfo/UpdateGameInfo.cpp) - Get list of games in DB (after InitAllGames) and push to DB info from steam web api
 
 
 
+### Dependencies
+`vcpkg install curl`
 
-----------------------------------------------
-vcpkg dependencies:
+`vcpkg install libpqxx`
 
-cURL
+`vcpkg install rapidjson`
 
-pqxx
+## Working on:
 
-rapidjson
+* After initial UpdateGameInfo complete - make upper-analytics for efficiency decision
+* Learn [SteamKit](https://github.com/SteamRE/SteamKit) and try to realise usefull methods in Lurker
+* Pricing for each region
+* Tags for games
+* Live Online
+* Comments for games
 
-
-
-
-----------------------------------------------
-TODO:
-
-*looping for game info and applist update. need some research to manage perfomance. In case of ~0.6s on game push for 170k+ games.
-
-*learn about SteamKit and try to reproduce it with c++
-
-*comment grabber
-
-*games online/subscribers && any other dynamic data that could be usefull in graphs
-
-*increment html parsing library to grab additional data from stem http
+### Longterms
+* Web interface for "Steam Pulse" (upper level analytics of platform e.g. games/year, games/languages e.t.c)
+* Steamworks csv analytics (Steam traffic, Pricing, wishlists/cohort)
+ 
