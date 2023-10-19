@@ -1,4 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.26)
+﻿cmake_minimum_required (VERSION 3.28.0)
 
 project (Lurker)
 
@@ -6,15 +6,14 @@ set(CMAKE_CXX_STANDARD 17)
 
 if(WIN32)
     set(VCPKG_ROOT "D:/vcpkg/")
-    #set(CMAKE_TOOLCHAIN_FILE "D:/vcpkg/scripts/buildsystems/vcpkg.cmake")
+    set(CMAKE_TOOLCHAIN_FILE "D:/vcpkg/scripts/buildsystems/vcpkg.cmake")
 else()
-
-    set(VCPKG_ROOT "/root/vcpkg")
-    set(VCPKG_TARGET_TRIPLET "x64-linux")
-    #set(CMAKE_TOOLCHAIN_FILE "/root/vcpkg/scripts/buildsystems/vcpkg.cmake")
+    set (CURL_DIR "/usr/local/share/vcpkg/installed/x64-linux/share/curl/")
+    set (RapidJSON_DIR "/usr/local/share/vcpkg/installed/x64-linux/share/rapidjson/")
+    set (libpqxx_DIR "/usr/local/share/vcpkg/installed/x64-linux/share/libpqxx/")
+    set (PostgreSQL_INCLUDE_DIR "/usr/local/share/vcpkg/installed/x64-linux/share/postgresql/")
 endif()
 
-set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/out/install")
 
 find_package(CURL CONFIG REQUIRED)
 find_package(RapidJSON CONFIG REQUIRED)

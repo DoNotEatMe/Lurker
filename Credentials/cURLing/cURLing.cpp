@@ -9,6 +9,7 @@
 //internal
 #include <cURLing.h>
 #include <Logger.h>
+#include <curl/curl.h>
 //system
 #include <iostream>
 #include <string>
@@ -17,11 +18,11 @@
 
 cURLing::cURLing() {
 	curl = curl_easy_init();
-    
 }
 
 void cURLing::getHTML(const char* link)
 {
+    
     readBuffer.clear();
 
     if (curl) {

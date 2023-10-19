@@ -39,7 +39,7 @@ void UpdateGameInfo::mainFunc() {
 
 	std::vector<int> UpdateAppid;
 
-	for (auto& a : res) {
+	for (auto a : res) {
 		UpdateAppid.push_back(a["pk_game_appid"].as<int>());
 	}
 	res.clear();

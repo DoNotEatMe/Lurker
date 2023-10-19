@@ -6,6 +6,7 @@
 //vcpkg
 #include <pqxx/pqxx>
 
+
 Postgre::Postgre()
 {
     
@@ -13,11 +14,7 @@ Postgre::Postgre()
 
 pqxx::connection* Postgre::Connect()
 {
-    /*
-    D:\dev\LurkerNew\Credentials\Postrgre\Postgre.cpp(31): warning C4551: function call missing argument list
-    D:\dev\LurkerNew\Credentials\Postrgre\Postgre.cpp(41): warning C4715: 'Postgre::Connect': not all control paths return a value
-    */
-    
+        
     try {
         Acess cred;
         std::string connectionStr = "user=" + cred.getDBusername() +

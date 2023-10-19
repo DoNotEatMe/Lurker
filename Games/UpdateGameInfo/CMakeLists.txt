@@ -10,7 +10,12 @@ target_link_libraries(func PRIVATE logger libpqxx::pqxx)
 
 
 add_executable(UpdateGameInfo UpdateGameInfo.cpp)
+
 target_link_libraries(UpdateGameInfo PRIVATE func libpqxx::pqxx CURL::libcurl)
+
+install(TARGETS UpdateGameInfo DESTINATION /root/LurkerExec/UpdateGameInfo/)
+
+
 
 
 
