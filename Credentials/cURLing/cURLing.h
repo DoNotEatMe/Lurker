@@ -15,8 +15,6 @@ public:
 	std::string GetBuffer();
 	void clearBuffer();
 
-	class Logger* log;
-
 	~cURLing() {};
 
 private:

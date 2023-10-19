@@ -17,6 +17,7 @@ public:
 	~Logger();
 private:
 	
+	class Postgre* connection;
 	pqxx::connection* conn;
 	
 };

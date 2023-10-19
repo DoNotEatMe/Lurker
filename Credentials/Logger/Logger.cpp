@@ -10,9 +10,8 @@
 
 Logger::Logger()
 {
-    Postgre connection;
-    conn = connection.Connect();
-    
+    connection = new Postgre;
+    conn = connection->Connect();
 }
 
 //3 strings.
@@ -29,6 +28,7 @@ void Logger::post(std::string programm_name, int appid, std::string message, std
             type
         );
         txn.commit();
+        
     }
     catch (const std::exception& e) {
         std::cerr << "Logger | post error: " << e.what() << std::endl;
