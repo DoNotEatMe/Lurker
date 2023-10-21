@@ -10,19 +10,19 @@
 #include <cURLing.h>
 #include <Logger.h>
 #include <curl/curl.h>
+#include <Postgre.h>
 //system
 #include <iostream>
 #include <string>
 
 
-cURLing::cURLing() {
+cURLing::cURLing(Logger* log) {
+    LOG = log;
     curl = curl_easy_init();
 }
 
 void cURLing::getHTML(const char* link)
 {
-    
-
     readBuffer.clear();
 
     if (curl) {
@@ -38,25 +38,24 @@ void cURLing::getHTML(const char* link)
         if (res != CURLE_OK) {
             std::string error = curl_easy_strerror(res);
             
-            Logger log;
-            log.post("cURLing", 0, "curl_error: " + error, "error");
+            LOG->post("cURLing", 0, "curl_error: " + error, "error");
 
-            cURLing again;
+            cURLing again(LOG);
             again.getHTML(link);
             
         }
         else       
             if (response_code == 429) {
-                
-                Logger log;
-                log.post("cURLing", 0, "curl_error 429", "error");
 
+                //this post() is creating multiple connections and dont close them. Why?
+                LOG->post("cURLing", 0, "curl_error: 429", "error");
+                
                 int awake = 0;
                 while (awake != 1) {
                     SLEEPMAC(60);
                     awake++;
                 }
-                cURLing again;
+                cURLing again(LOG);
                 again.getHTML(link);
             }
         curl_easy_cleanup(curl);

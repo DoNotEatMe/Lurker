@@ -22,9 +22,6 @@ UpdateGameInfo::UpdateGameInfo()
 
 void UpdateGameInfo::mainFunc() {
 
-	Logger log;
-	
-
 	/*---------------------------------------------------------*/
 	/*  get all appid from DB, where game_last_update is empty */
 	/*  store appids in vector                                 */
@@ -33,15 +30,15 @@ void UpdateGameInfo::mainFunc() {
 	Postgre DB;
 	//DB.TablesCheck();
 
-	pqxx::work txn(*DB.Connect());
+	pqxx::connection *Conn = DB.Connect();
+	Logger log(Conn);
 	
+	pqxx::work txn(*Conn);
 	txn.exec("SET application_name = 'UpdateGameInfo main loop'");
-
 	std::string sql = "SELECT pk_game_appid FROM games WHERE game_last_db_update IS NULL";
 	pqxx::result res = txn.exec(sql);
 
 	std::vector<int> UpdateAppid;
-
 	for (auto a : res) {
 		UpdateAppid.push_back(a["pk_game_appid"].as<int>());
 	}
@@ -60,7 +57,7 @@ void UpdateGameInfo::mainFunc() {
 			//appid = 1625260;
 			std::string link = "https://store.steampowered.com/api/appdetails?appids=" + std::to_string(appid) + "&&cc=US";
 
-			cURLing curl;
+			cURLing curl(&log);
 			curl.getHTML(link.c_str());
 
 			rapidjson::Document document;
@@ -201,7 +198,6 @@ void UpdateGameInfo::mainFunc() {
 					error = e.what();
 					logmsg = "INSERT error: " + error;
 					log.post("UpdateGameInfo", appid, logmsg, "error");
-					log.status("UpdateGameInfo", 0);
 				}
 
 
@@ -232,7 +228,6 @@ void UpdateGameInfo::mainFunc() {
 								error = e.what();
 								logmsg = "INSERT error: " + error;
 								log.post("UpdateGameInfo", appid, logmsg, "warning");
-								log.status("UpdateGameInfo", 0);
 
 							}
 						}
@@ -266,7 +261,6 @@ void UpdateGameInfo::mainFunc() {
 							error = e.what();
 							logmsg = "INSERT error: " + error;
 							log.post("UpdateGameInfo", appid, logmsg, "warning");
-							log.status("UpdateGameInfo", 0);
 						}
 					}
 				}
@@ -297,7 +291,6 @@ void UpdateGameInfo::mainFunc() {
 							error = e.what();
 							logmsg = "INSERT error: " + error;
 							log.post("UpdateGameInfo", appid, logmsg, "warning");
-							log.status("UpdateGameInfo", 0);
 
 						}
 					}
@@ -329,7 +322,6 @@ void UpdateGameInfo::mainFunc() {
 							error = e.what();
 							logmsg = "INSERT error: " + error;
 							log.post("UpdateGameInfo", appid, logmsg, "warning");
-							log.status("UpdateGameInfo", 0);
 						}
 
 					}
@@ -355,7 +347,6 @@ void UpdateGameInfo::mainFunc() {
 							error = e.what();
 							logmsg = "INSERT error: " + error;
 							log.post("UpdateGameInfo", appid, logmsg, "warning");
-							log.status("UpdateGameInfo", 0);
 						}
 					}
 				}
@@ -383,7 +374,6 @@ void UpdateGameInfo::mainFunc() {
 							error = e.what();
 							logmsg = "INSERT error: " + error;
 							log.post("UpdateGameInfo", appid, logmsg, "warning");
-							log.status("UpdateGameInfo", 0);
 						}
 					}
 				}
@@ -419,7 +409,6 @@ void UpdateGameInfo::mainFunc() {
 							error = e.what();
 							logmsg = "INSERT error: " + error;
 							log.post("UpdateGameInfo", appid, logmsg, "warning");
-							log.status("UpdateGameInfo", 0);
 						}
 
 						++it;
@@ -440,7 +429,6 @@ void UpdateGameInfo::mainFunc() {
 			error = e.what();
 			logmsg = "INSERT error: " + error;
 			log.post("UpdateGameInfo_mainLoop", appid, logmsg, "error");
-			log.status("UpdateGameInfo", 0);
 		}
 
 

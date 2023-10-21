@@ -1,6 +1,7 @@
 //internal 
 #include <cURLing.h>
 #include <Postgre.h>
+#include <Logger/Logger.h>
 
 //system
 #include <iostream>
@@ -20,11 +21,14 @@
 
 int main() {
 	Postgre DB;
+	pqxx::connection* connPtr = DB.Connect();
 	DB.TablesCheck();
 		
 	std::string link = "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json";
 
-	cURLing curl;
+	Logger log(connPtr);
+	cURLing curl(&log);
+
 	curl.getHTML(link.c_str());
 	
 	rapidjson::Document document;
@@ -34,7 +38,7 @@ int main() {
 
 	const rapidjson::Value& apps = document["applist"]["apps"];
 
-	pqxx::connection* connPtr = DB.Connect();
+	
 	pqxx::work txn(*connPtr);
 	txn.exec("SET application_name = 'Logger post'");
 
@@ -75,6 +79,8 @@ int main() {
 				std::cout << "Query execution time: " << duration.count() << " seconds" << std::endl;
 
 			} catch (const std::exception& e) {
+				std::string error = e.what();
+				log.post("InitAllAGames", 0, error, "warning");
 				std::cerr << "Error: " << e.what() << std::endl;
 			}
 		}

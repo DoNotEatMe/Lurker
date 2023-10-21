@@ -30,12 +30,13 @@ pqxx::connection* Postgre::Connect()
         }
         else {
             std::cerr << "Failed to connect to the PostgreSQL server!" << std::endl;
-            exit;
+            return nullptr;
         }
         
     }
     catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
+        return nullptr;
     }
 }
 
