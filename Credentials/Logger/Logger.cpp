@@ -48,7 +48,6 @@ void Logger::status(std::string programm_name, bool is_work)
             is_work);
         txn.commit();
 
-
     }
   catch (const std::exception& e) {
         std::cerr << "Logger | status error: " << e.what() << std::endl;

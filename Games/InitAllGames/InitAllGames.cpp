@@ -26,7 +26,8 @@ int main() {
 		
 	std::string link = "http://api.steampowered.com/ISteamApps/GetAppList/v0002/?format=json";
 
-	Logger log(connPtr);
+	Postgre Logging;
+	Logger log(Logging.Connect());
 	cURLing curl(&log);
 
 	curl.getHTML(link.c_str());
@@ -40,7 +41,7 @@ int main() {
 
 	
 	pqxx::work txn(*connPtr);
-	txn.exec("SET application_name = 'Logger post'");
+	txn.exec("SET application_name = 'Logger UpdateGameInfo'");
 
 	std::string sql = "SELECT COUNT(*) FROM games";
 	pqxx::result res = txn.exec(sql);

@@ -28,12 +28,15 @@ void UpdateGameInfo::mainFunc() {
 	/*---------------------------------------------------------*/
 
 	Postgre DB;
-	//DB.TablesCheck();
+
+	Postgre Logging;
+	
+	Logger log(Logging.Connect());
+
 
 	pqxx::connection *Conn = DB.Connect();
-	Logger log(Conn);
-	
 	pqxx::work txn(*Conn);
+	
 	txn.exec("SET application_name = 'UpdateGameInfo main loop'");
 	std::string sql = "SELECT pk_game_appid FROM games WHERE game_last_db_update IS NULL";
 	pqxx::result res = txn.exec(sql);
