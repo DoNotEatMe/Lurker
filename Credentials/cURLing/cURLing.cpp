@@ -15,7 +15,6 @@
 #include <string>
 
 
-
 cURLing::cURLing() {
     curl = curl_easy_init();
 }

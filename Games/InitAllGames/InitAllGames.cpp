@@ -1,6 +1,7 @@
 //internal 
 #include <cURLing.h>
 #include <Postgre.h>
+
 //system
 #include <iostream>
 #include <chrono>
@@ -35,6 +36,8 @@ int main() {
 
 	pqxx::connection* connPtr = DB.Connect();
 	pqxx::work txn(*connPtr);
+	txn.exec("SET application_name = 'Logger post'");
+
 	std::string sql = "SELECT COUNT(*) FROM games";
 	pqxx::result res = txn.exec(sql);
 

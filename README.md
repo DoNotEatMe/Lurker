@@ -33,6 +33,10 @@ Lurker is pretty shallow now, but I have vision to work on.
 * Comments for games
 
 ### Longterms
+
 * Web interface for "Steam Pulse" (upper level analytics of platform e.g. games/year, games/languages e.t.c)
 * Steamworks csv analytics (Steam traffic, Pricing, wishlists/cohort)
  
+
+#### Known issues
+* too many 429. Proxy holder needed or SteamKitResearch.

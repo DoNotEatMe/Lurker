@@ -34,6 +34,9 @@ void UpdateGameInfo::mainFunc() {
 	//DB.TablesCheck();
 
 	pqxx::work txn(*DB.Connect());
+	
+	txn.exec("SET application_name = 'UpdateGameInfo main loop'");
+
 	std::string sql = "SELECT pk_game_appid FROM games WHERE game_last_db_update IS NULL";
 	pqxx::result res = txn.exec(sql);
 
@@ -433,10 +436,10 @@ void UpdateGameInfo::mainFunc() {
 
 		}
 		catch (const std::exception& e) {
-
+			
 			error = e.what();
 			logmsg = "INSERT error: " + error;
-			log.post("UpdateGameInfo", appid, logmsg, "error");
+			log.post("UpdateGameInfo_mainLoop", appid, logmsg, "error");
 			log.status("UpdateGameInfo", 0);
 		}
 
