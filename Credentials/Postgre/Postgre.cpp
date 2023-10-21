@@ -6,7 +6,6 @@
 //vcpkg
 #include <pqxx/pqxx>
 
-
 Postgre::Postgre()
 {
     
@@ -23,11 +22,11 @@ pqxx::connection* Postgre::Connect()
             " port=" + cred.getDBport() +
             " dbname =" + cred.getDBname();
 
-        pqxx::connection* conn= new pqxx::connection(connectionStr);
+        pqxx::connection* Connection = new pqxx::connection(connectionStr);
         
         
-        if (conn->is_open()) {
-            return conn;
+        if (Connection->is_open()) {
+            return Connection;
         }
         else {
             std::cerr << "Failed to connect to the PostgreSQL server!" << std::endl;
@@ -37,10 +36,7 @@ pqxx::connection* Postgre::Connect()
     }
     catch (const std::exception& e) {
         std::cerr << "Error: " << e.what() << std::endl;
-        
     }
-
-    
 }
 
 void Postgre::TablesCheck()
@@ -314,6 +310,8 @@ void Postgre::TablesCheck()
                 OWNER to postgres;
             )";
 
+
+    txn.exec("SET application_name = 'Postgres core'");
     txn.exec(createGames);    
     txn.exec(createPublishers);    
     txn.exec(createDevelopers);   
