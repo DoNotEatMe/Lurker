@@ -421,6 +421,21 @@ void UpdateGameInfo::mainFunc() {
 				txn.commit();
 
 			}
+			else if (document.IsObject() && document[std::to_string(appid).c_str()]["success"].GetBool() == false) {
+
+				std::string games = "UPDATE games SET game_last_db_update = NOW() WHERE pk_game_appid = $1;";
+
+				try {
+					txn.exec_params(games, appid);
+					txn.commit();
+				}
+				catch (const std::exception& e) {
+
+					error = e.what();
+					logmsg = "INSERT error: " + error;
+					log.post("UpdateGameInfo", appid, logmsg, "error");
+				}
+			}
 
 			auto end_time = std::chrono::high_resolution_clock::now();
 			auto duration = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time);
