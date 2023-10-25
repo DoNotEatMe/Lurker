@@ -38,7 +38,7 @@ void UpdateGameInfo::mainFunc() {
 	pqxx::work txn(*Conn);
 	
 	txn.exec("SET application_name = 'UpdateGameInfo main loop'");
-	std::string sql = "SELECT pk_game_appid FROM games WHERE game_last_db_update IS NULL";
+	std::string sql = "SELECT pk_game_appid FROM games WHERE game_last_db_update < now() - interval '1 day'";
 	pqxx::result res = txn.exec(sql);
 
 	std::vector<int> UpdateAppid;
@@ -382,6 +382,7 @@ void UpdateGameInfo::mainFunc() {
 				}
 
 				// Languages
+				// TODO: Regex need fix. Output data is bad
 				if (app.HasMember("supported_languages") && !app["supported_languages"].IsNull()){
 					std::string input = app["supported_languages"].GetString();
 

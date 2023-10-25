@@ -34,9 +34,11 @@ Lurker is pretty shallow now, but I have vision to work on.
 
 ### Longterms
 
+* Somithing like SteamKit listner to Steam changes. Need to research steam callbacs and 
 * Web interface for "Steam Pulse" (upper level analytics of platform e.g. games/year, games/languages e.t.c)
 * Steamworks csv analytics (Steam traffic, Pricing, wishlists/cohort)
  
 
 #### Known issues
+* Language incorrect regex, so bad DB results.
 * too many 429. Proxy holder needed or SteamKitResearch.
